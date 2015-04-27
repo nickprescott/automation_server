@@ -1,5 +1,10 @@
-This application requires a database with the following two tables:
+Install the dependencies with:
+npm install
 
+Start the server with:
+node automation_metrics_server.js config.js
+
+This application requires a database with the following two tables:
 
 CREATE TABLE "testcases" (
     "testcase_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ,
@@ -14,3 +19,5 @@ CREATE TABLE "execution_history" (
     "execution_time" REAL,
     "error_msg" TEXT
 );
+
+The database name can be set in the config.js file.
