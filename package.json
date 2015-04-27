@@ -1,0 +1,21 @@
+{
+  "name": "automation_server",
+  "version": "1.0.0",
+  "description": "Serve and display automation results",
+  "main": "automation_metrics_server.js",
+  "dependencies": {
+    "body-parser": "^1.12.3",
+    "express": "^4.12.3",
+    "globule": "^0.2.0",
+    "sqlite3": "^3.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+  },
+  "author": "Nick Prescott",
+  "license": "ISC"
+}
