@@ -8,7 +8,7 @@ var fs = require('fs'),
 
 var app = express();
 var server;
-var db = new sqlite3.Database(config.dbName); 
+var db = new sqlite3.Database(config.dbName);
 
 //Serve the index.html page
 app.use(express.static(__dirname+'/web_app'));
@@ -28,6 +28,7 @@ app.get('/api/getfile', function(req, res) {
         fullResponse.push(row);
     },
     function(err, numRows) {
+	res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(fullResponse));
     });
 
@@ -37,6 +38,7 @@ app.get('/api/getAllTestNames', function(req, res) {
     var sqlGetNames = "Select name from testcases";
 
     db.all(sqlGetNames, function(err, rows) {
+	res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(rows));
     });
 
@@ -62,4 +64,4 @@ app.post('/api/sendfile', function(req, res) {
 });
 
 server = app.listen(config.port);
-
+console.log("server listening on port: %d", config.port)
