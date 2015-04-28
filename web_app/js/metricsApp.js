@@ -21,7 +21,6 @@ var automationMetrics = (function () {
 
         selector = $container.find('#testSelector');
         selector.on('change', getTestCaseData);
-
     }
 
     getTestCaseData = function() {
@@ -35,12 +34,13 @@ var automationMetrics = (function () {
             var times = [];
             var timestamps = [];
             var statuses = [];
-            var x;
+            var x, row;
 
             for(x=0; x<data.length; x++) {
-                times.push(data[x]['execution_time']);
-                timestamps.push(formatDate(data[x]['date']));
-                statuses.push(data[x]['status']);
+                row = data[x];
+                times.push(row.execution_time);
+                timestamps.push(formatDate(row.date));
+                statuses.push(row.status);
             }
             displayChart('#executionTimeChart', timestamps, times, statuses);
         });

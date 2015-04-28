@@ -16,29 +16,28 @@ app.use(bodyParser.json());
 
 app.get('/api/getfile', function(req, res) {
     var fullResponse = [];
-    var x, name, sqlSelect, results;
+    var name, sqlSelect;
 
     name = req.query.files;
 
-    sqlSelect = util.format("Select tc.name, eh.status, eh.date, eh.execution_time from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and tc.name = '%s' ORDER BY eh.date ASC", name);
+    sqlSelect = "Select tc.name, eh.status, eh.date, eh.execution_time from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and tc.name = ? ORDER BY eh.date ASC";
 
     //process each row. Could use db.all instead...
     //on completion, send all the rows to the client
-    results = db.each(sqlSelect, function(err, row) {
+    db.each(sqlSelect, ""+name, function(err, row) {
         fullResponse.push(row);
     },
     function(err, numRows) {
-	res.set('Content-Type', 'application/json');
+	    res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(fullResponse));
     });
-
 });
 
 app.get('/api/getAllTestNames', function(req, res) {
     var sqlGetNames = "Select name from testcases";
 
     db.all(sqlGetNames, function(err, rows) {
-	res.set('Content-Type', 'application/json');
+	    res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(rows));
     });
 
@@ -48,15 +47,17 @@ app.post('/api/sendfile', function(req, res) {
     var testcaseData = req.body;
     var sqlInsertTestcase, sqlInsertExecutionResult;
 
-    sqlInsertTestcase = util.format("Insert OR IGNORE into testcases (name, description) values ('%s', '%s');", testcaseData['name'], "");
+    sqlInsertTestcase = "Insert OR IGNORE into testcases (name, description) values ('?', '?');";
 
-    sqlInsertExecutionResult = util.format("Insert into execution_history (tc_id, status, execution_time, date, error_msg) values ((Select testcase_id from testcases where name = '%s'), '%s', %d, %s, '%s');",testcaseData['name'], testcaseData['status'], testcaseData['execution_time'], testcaseData['date'], testcaseData['error_info'].replace(/'/g, '"'));
+    sqlInsertExecutionResult = "Insert into execution_history (tc_id, status, execution_time, date, error_msg) values ((Select testcase_id from testcases where name = '?'), '?', , ?, '?');";
 
     //serialize db insert to ensure that the test case exists in the testcases table before trying to insert
     //into the execution_history table
     db.serialize(function() {
-        db.run(sqlInsertTestcase);
-        db.run(sqlInsertExecutionResult);
+        db.run(sqlInsertTestcase, testcaseData.name, "");
+        db.run(sqlInsertExecutionResult, testcaseData.name, 
+            testcaseData.status, testcaseData.execution_time, 
+            testcaseData.date, testcaseData.error_info.replace(/'/g, '"'));
 
         res.writeHead(201, {'Content-Type': 'application/json'});
         res.end();
