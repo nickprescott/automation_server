@@ -5,7 +5,6 @@ var automationMetrics = (function () {
                 '<div class="application-container">'
                 + '<div id="btnBar">'
                     + '<select id="testSelector"></select>'
-                    + '<button id="retrieveData">Refresh Chart</button>'
                 + '</div>'
                 + '<canvas id="executionTimeChart"></canvas>'
                 + '<table id="statusTable"></table>'
@@ -15,13 +14,13 @@ var automationMetrics = (function () {
         initModules, displayChart, getTestCaseData, getTests, formatDate;
 
     initModule = function($container) {
-        var button;
+        var selector; 
 
         $container.html(configMap.main_html);
-        getTests($container.find('#testSelector'));
+        getTests($container.find('#testSelector'), getTestCaseData);
 
-        button = $container.find('#retrieveData');
-        button.on('click', getTestCaseData);
+        selector = $container.find('#testSelector');
+        selector.on('change', getTestCaseData);
 
     }
 
@@ -86,7 +85,7 @@ var automationMetrics = (function () {
      * populate the test selector element with the names of all test cases
      * TODO: Could move the view logic somewhere else
      */
-    getTests = function($container) {
+    getTests = function($container, callback) {
         var client = new HttpClient();
 
         client.get(configMap.server + '/api/getAllTestNames', function(results) {
@@ -97,6 +96,7 @@ var automationMetrics = (function () {
                 tempHtml = "<option value='"+x+"'>"+data[x]['name']+"</option>";
                 $(tempHtml).appendTo($container);   
             }
+            callback();
         });
     };
 
