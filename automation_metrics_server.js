@@ -3,7 +3,6 @@ var fs = require('fs'),
     express = require('express'),
     config = require('./'+process.argv[2]),
     bodyParser = require('body-parser'),
-    util = require('util'),
     sqlite3 = require('sqlite3');
 
 var app = express();
@@ -47,9 +46,9 @@ app.post('/api/sendfile', function(req, res) {
     var testcaseData = req.body;
     var sqlInsertTestcase, sqlInsertExecutionResult;
 
-    sqlInsertTestcase = "Insert OR IGNORE into testcases (name, description) values ('?', '?');";
+    sqlInsertTestcase = "Insert OR IGNORE into testcases (name, description) values (?, ?);";
 
-    sqlInsertExecutionResult = "Insert into execution_history (tc_id, status, execution_time, date, error_msg) values ((Select testcase_id from testcases where name = '?'), '?', , ?, '?');";
+    sqlInsertExecutionResult = "Insert into execution_history (tc_id, status, execution_time, date, error_msg) values ((Select testcase_id from testcases where name = ?), ?, ?, ?, ?);";
 
     //serialize db insert to ensure that the test case exists in the testcases table before trying to insert
     //into the execution_history table
