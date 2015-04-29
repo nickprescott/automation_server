@@ -2,13 +2,14 @@ var automationMetrics = (function () {
 
     var configMap = {
             main_html:
-                '<div class="application-container">'
-                + '<div id="btnBar">'
-                    + '<select id="testSelector"></select>'
-                + '</div>'
-                + '<canvas id="executionTimeChart"></canvas>'
+	        '<div class="application-container">'
+                + '<div class=chart-container>'
+	            + '<h2>Test Case Execution Times (seconds)</h2>'
+		    + '<select id="testSelector"></select>'
+		    + '<canvas id="executionTimeChart"></canvas>'
+	         +'</div>'
                 + '<table id="statusTable"></table>'
-                + '</div>',
+	      + '</div>',
             server: 'http://'+ location.host
         },
         initModules, displayChart, getTestCaseData, getTests, formatDate;
@@ -62,8 +63,8 @@ var automationMetrics = (function () {
         datasets: [
                   {
                     label: "testcase",
-                    fillColor: "rgba(4,196,176,0.3)",
-                    strokeColor: "rgba(3,145,131,1)",
+		    fillColor: "rgba(230,237,236,0.4)",
+                    strokeColor: "rgba(230,237,236,0.9)",
                     data: values
                    }
                 ]
@@ -73,7 +74,7 @@ var automationMetrics = (function () {
         //set point color based on status 
         for (x=0; x<statuses.length;x++) {
             if (statuses[x].toLowerCase() == 'pass')
-                color = "green";
+                color = "#7fe87f";
             else
                 color = "red";
             lineChart.datasets[0].points[x].fillColor = color;
