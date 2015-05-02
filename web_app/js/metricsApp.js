@@ -3,21 +3,27 @@ var automationMetrics = (function () {
     var configMap = {
             main_html:
 	        '<div class="application-container">'
-                + '<div class=chart-container>'
-	            + '<h2>Test Case Execution Times (seconds)</h2>'
-		    + '<select id="testSelector"></select>'
-		    + '<canvas id="executionTimeChart"></canvas>'
-	         +'</div>'
-                + '<table id="statusTable"></table>'
-	      + '</div>',
+                + '<div class="chart-container">'
+	                + '<h2>Test Case Execution Times (seconds)</h2>'
+		            + '<select id="testSelector"></select>'
+		            + '<canvas id="executionTimeChart"></canvas>'
+	            + '</div>'
+                + '<div class="chart-container">'
+                    + '<h2>Aggregate Test Status Counts</h2>'
+                    + '<canvas id="aggTestCounts"></canvas>'
+                    + '<div id="aggLegend"></div>'
+                + '</div>'
+	        + '</div>',
             server: 'http://'+ location.host
         },
-        initModules, displayChart, getTestCaseData, getTests, formatDate;
+        initModules, displayChart, getAggTestCounts, displayAggTestCounts, getTestCaseData, getTests, formatDate;
 
     initModule = function($container) {
         var selector; 
 
         $container.html(configMap.main_html);
+        
+        getAggTestCounts($container.find('#aggTestCounts'));
         getTests($container.find('#testSelector'), getTestCaseData);
 
         selector = $container.find('#testSelector');
@@ -63,7 +69,7 @@ var automationMetrics = (function () {
         datasets: [
                   {
                     label: "testcase",
-		    fillColor: "rgba(230,237,236,0.4)",
+		            fillColor: "rgba(230,237,236,0.4)",
                     strokeColor: "rgba(230,237,236,0.9)",
                     data: values
                    }
@@ -80,6 +86,67 @@ var automationMetrics = (function () {
             lineChart.datasets[0].points[x].fillColor = color;
         }
         lineChart.update();
+    }
+
+    getAggTestCounts = function (elementId) {
+        $.ajax({
+            url : configMap.server + '/api/allTestStatuses',
+            type : 'GET',
+            dataType: 'json',
+            success : function (results) {
+                displayAggTestCounts(elementId, results); 
+            }
+        });
+    }
+
+    displayAggTestCounts = function(elementId, results) {
+        var chartElement = $(elementId)[0].getContext("2d");
+        var aggregateChart, legend;
+        var  x, row;
+        var dates, pass_data, fail_data,skip_data;
+        dates = [];
+        pass_data = [];
+        fail_data = [];
+        skip_data = [];
+
+        for(x=0; x<results.length; x++) {
+            row = results[x];
+            dates.push(formatDate(row.date));
+            pass_data.push(row.pass_count);
+            fail_data.push(row.fail_count + row.error_count);
+            skip_data.push(row.skip_count);
+        }
+
+        data = {
+        labels: dates,
+        datasets: [
+                  {
+                    label: "passing tests",
+                    pointColor: "#7fe87f",
+                    fillColor: "rgba(230,237,236,0.4)",
+                    strokeColor: "rgba(230,237,236,0.9)",
+                    data: pass_data
+                   },
+                   {
+                    label: "failing tests",
+                    pointColor: "red",
+                    fillColor: "rgba(230,237,236,0.4)",
+                    strokeColor: "rgba(230,237,236,0.9)",
+                    data: fail_data
+                   },
+                   {
+                    label: "skipped tests",
+                    pointColor: "blue",
+                    fillColor: "rgba(230,237,236,0.4)",
+                    strokeColor: "rgba(230,237,236,0.9)",
+                    data: skip_data
+                   }
+                ]
+              }; 
+
+        aggregateChart = new Chart(chartElement).Line(data);
+        legend = aggregateChart.generateLegend();
+        $('#aggLegend').html(legend);
     }
 
     /*
@@ -110,4 +177,5 @@ var automationMetrics = (function () {
     return {
         initModule: initModule
     }
+
 })()

@@ -42,6 +42,44 @@ app.get('/api/getAllTestNames', function(req, res) {
 
 });
 
+app.get('/api/allTestStatuses', function(req, res) {
+    var sql = "Select DISTINCT ex.date as date, coalesce(a.pass_count, 0) as pass_count, "+
+    "coalesce(b.fail_count, 0) as fail_count, "+
+    "coalesce(c.error_count, 0) as error_count, "+
+    "coalesce(d.skip_count, 0) as skip_count "+
+    "From execution_history ex "+
+    "left outer join "+
+    "(select date, count(status) as pass_count "+ 
+    "from execution_history "+ 
+    "where status = 'pass' "+
+    "Group By date) a "+
+    "On ex.date = a.date "+
+    "left outer join "+
+    "(select date, count(status) as fail_count "+
+    "from execution_history "+
+    "where status = 'failure' "+
+    "Group By date) b "+
+    "on ex.date = b.date "+
+    "left outer join "+
+    "(select date, count(status) as error_count "+
+    "from execution_history "+
+    "where status = 'error' "+
+    "Group By date) c "+
+    "on ex.date = c.date "+
+    "left outer join "+
+    "(select date, count(status) as skip_count "+
+    "from execution_history  "+
+    "where status = 'skipped' "+
+    "Group By date) d "+
+    "on ex.date = d.date "+
+    "ORDER BY ex.date ASC;"; 
+
+    db.all(sql, function(err, rows) {
+	    res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(rows));
+    });
+});
+
 app.post('/api/sendfile', function(req, res) {
     var testcaseData = req.body;
     var sqlInsertTestcase, sqlInsertExecutionResult;
