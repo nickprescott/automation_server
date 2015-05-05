@@ -12,6 +12,10 @@ var automationMetrics = (function () {
                     + '<h2>Aggregate Test Status Counts</h2>'
                     + '<canvas id="aggTestCounts"></canvas>'
                     + '<div id="aggLegend"></div>'
+                    + '<div id="failure-popup" class="popup">'
+                        + '<div id="failure-popup-title" class="popup-title">List of failed testcases <span id="close-failure-popup">X</span></div>'
+                        + '<div id="failure-content" class="popup-content"></div>'
+                    + '</div>'
                 + '</div>'
 	        + '</div>',
             server: 'http://'+ location.host
@@ -28,6 +32,10 @@ var automationMetrics = (function () {
 
         selector = $container.find('#testSelector');
         selector.on('change', getTestCaseData);
+
+        $('#close-failure-popup').on('click', function() {
+            $('#failure-popup').css('display', 'none');
+        });
     }
 
     getTestCaseData = function() {
@@ -180,7 +188,16 @@ var automationMetrics = (function () {
                     type : 'GET',
                     dataType: 'json',
                     success : function (moreResults) {
+                        var output, x;
                         allResults = allResults.concat(moreResults);
+                        output = "";
+
+                        for( x=0; x < allResults.length; x++) {
+                            output += allResults[x].name + "<br>";
+                        }
+                        //display popup with failed test names
+                        $('#failure-content').html(output);
+                        $('#failure-popup').css('display', 'block');
                     }
                 });
             }
