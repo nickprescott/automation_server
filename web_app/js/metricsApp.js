@@ -16,7 +16,7 @@ var automationMetrics = (function () {
 	        + '</div>',
             server: 'http://'+ location.host
         },
-        initModules, displayChart, getAggTestCounts, displayAggTestCounts, getTestCaseData, getTests, formatDate;
+        initModules, displayChart, getAggTestCounts, displayAggTestCounts, displayListOfFailedTests, getTestCaseData, getTests, formatDate;
 
     initModule = function($container) {
         var selector; 
@@ -31,25 +31,28 @@ var automationMetrics = (function () {
     }
 
     getTestCaseData = function() {
-        var client = new HttpClient();
         var testcaseName;
-
         testcaseName = $('#testSelector :selected').text();
 
-        client.get(configMap.server + '/api/getfile?files='+testcaseName, function(results) {
-            var data = JSON.parse(results);
-            var times = [];
-            var timestamps = [];
-            var statuses = [];
-            var x, row;
+        $.ajax({
+            url: configMap.server + '/api/testcases',
+            data: { tests: testcaseName},
+            type: 'GET',
+            dataType: 'json',
+            success: function(results) {
+                var times = [];
+                var timestamps = [];
+                var statuses = [];
+                var x, row;
 
-            for(x=0; x<data.length; x++) {
-                row = data[x];
-                times.push(row.execution_time);
-                timestamps.push(formatDate(row.date));
-                statuses.push(row.status);
+                for(x=0; x<results.length; x++) {
+                    row = results[x];
+                    times.push(row.execution_time);
+                    timestamps.push(formatDate(row.date));
+                    statuses.push(row.status);
+                }
+                displayChart('#executionTimeChart', timestamps, times, statuses);
             }
-            displayChart('#executionTimeChart', timestamps, times, statuses);
         });
     }
 
@@ -94,7 +97,11 @@ var automationMetrics = (function () {
             type : 'GET',
             dataType: 'json',
             success : function (results) {
-                displayAggTestCounts(elementId, results); 
+                aggChart = displayAggTestCounts(elementId, results); 
+                $(elementId).click(function (evt) {
+                    var activePoints = aggChart.getPointsAtEvent(evt);
+                    displayListOfFailedTests(activePoints);
+                });
             }
         });
     }
@@ -147,24 +154,57 @@ var automationMetrics = (function () {
         aggregateChart = new Chart(chartElement).Line(data);
         legend = aggregateChart.generateLegend();
         $('#aggLegend').html(legend);
+        return aggregateChart;
     }
+
+    /*
+     *Display a tooltip with the names of the failed testcases.
+     */
+    displayListOfFailedTests = function(dataPoints) {
+
+        //get the date in unix-epoch format
+        var failureDate = Date.parse(dataPoints[1].label)/1000;
+        var allResults = [];
+
+        $.ajax({
+            url : configMap.server + '/api/testNamesByDateAndStatus',
+            data: { date: failureDate, status: 'failure'},
+            type : 'GET',
+            dataType: 'json',
+            success : function (results) {
+                allResults = allResults.concat(results);
+                //need the tests whose status was 'error' as well
+                $.ajax({
+                    url : configMap.server + '/api/testNamesByDateAndStatus',
+                    data: { date: failureDate, status: 'error'},
+                    type : 'GET',
+                    dataType: 'json',
+                    success : function (moreResults) {
+                        allResults = allResults.concat(moreResults);
+                    }
+                });
+            }
+        });
+    };
 
     /*
      * populate the test selector element with the names of all test cases
      * TODO: Could move the view logic somewhere else
      */
     getTests = function($container, callback) {
-        var client = new HttpClient();
+        $.ajax({
+            url: configMap.server + '/api/allTestNames',
+            type: 'GET',
+            dataType: 'json',
+            success: function(results) {
+                var x, tempHtml;
 
-        client.get(configMap.server + '/api/getAllTestNames', function(results) {
-            var data, x, tempHtml;
-            data = JSON.parse(results);
-
-            for(x=0; x<data.length;x++) {
-                tempHtml = "<option value='"+x+"'>"+data[x]['name']+"</option>";
-                $(tempHtml).appendTo($container);   
+                for(x=0; x<results.length;x++) {
+                    tempHtml = "<option value='"+x+"'>"+results[x]['name']+"</option>";
+                    $(tempHtml).appendTo($container);   
+                }
+                callback();
             }
-            callback();
         });
     };
 

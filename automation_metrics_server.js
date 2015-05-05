@@ -13,11 +13,11 @@ var db = new sqlite3.Database(config.dbName);
 app.use(express.static(__dirname+'/web_app'));
 app.use(bodyParser.json());
 
-app.get('/api/getfile', function(req, res) {
+app.get('/api/testcases', function(req, res) {
     var fullResponse = [];
     var name, sqlSelect;
 
-    name = req.query.files;
+    name = req.query.tests;
 
     sqlSelect = "Select tc.name, eh.status, eh.date, eh.execution_time from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and tc.name = ? ORDER BY eh.date ASC";
 
@@ -32,7 +32,7 @@ app.get('/api/getfile', function(req, res) {
     });
 });
 
-app.get('/api/getAllTestNames', function(req, res) {
+app.get('/api/allTestNames', function(req, res) {
     var sqlGetNames = "Select name from testcases";
 
     db.all(sqlGetNames, function(err, rows) {
@@ -76,6 +76,19 @@ app.get('/api/allTestStatuses', function(req, res) {
 
     db.all(sql, function(err, rows) {
 	    res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(rows));
+    });
+});
+
+app.get('/api/testNamesByDateAndStatus', function(req, res) {
+    var sql;
+    var date = req.query.date;
+    var status = req.query.status;
+
+    sql = "Select tc.name from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and eh.date = ? and eh.status = ?;"
+
+    db.all(sql, date, status, function(err, rows) {
+        res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(rows));
     });
 });
