@@ -18,6 +18,10 @@ select {
   background-color: #f8f8f8;
 }
 
+ul {
+  list-style-type: none;
+}
+
 .application-container {
   margin: 20px;
   background-color: white;
@@ -33,7 +37,7 @@ select {
 
 .popup {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 25%;
   left: 25%;
   width: 50%;
@@ -62,4 +66,13 @@ select {
 
 .popup-content {
   padding: 10px;
+}
+
+.legend {
+  float: right;
+  width: 100px;
+  padding: 5px;
+  border-width: 2px;
+  border-color: rgba(170,170,170,.9);
+  border-style: solid;
 }

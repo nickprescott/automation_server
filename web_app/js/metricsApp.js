@@ -9,9 +9,9 @@ var automationMetrics = (function () {
 		            + '<canvas id="executionTimeChart"></canvas>'
 	            + '</div>'
                 + '<div class="chart-container">'
-                    + '<h2>Aggregate Test Status Counts</h2>'
+                    + '<h2 style="float:left">Aggregate Test Status Counts</h2>'
+                    + '<ul id="aggLegend" class="legend"></ul>'
                     + '<canvas id="aggTestCounts"></canvas>'
-                    + '<div id="aggLegend"></div>'
                     + '<div id="failure-popup" class="popup">'
                         + '<div id="failure-popup-title" class="popup-title">List of failed testcases <span id="close-failure-popup">X</span></div>'
                         + '<div id="failure-content" class="popup-content"></div>'
@@ -116,8 +116,8 @@ var automationMetrics = (function () {
 
     displayAggTestCounts = function(elementId, results) {
         var chartElement = $(elementId)[0].getContext("2d");
-        var aggregateChart, legend;
-        var  x, row;
+        var aggregateChart;
+        var  x, row, i, listItem;
         var dates, pass_data, fail_data,skip_data;
         dates = [];
         pass_data = [];
@@ -136,21 +136,21 @@ var automationMetrics = (function () {
         labels: dates,
         datasets: [
                   {
-                    label: "passing tests",
-                    pointColor: "#7fe87f",
+                    label: "Passing tests",
+                    pointColor: "#6CD960",
                     fillColor: "rgba(230,237,236,0.4)",
                     strokeColor: "rgba(230,237,236,0.9)",
                     data: pass_data
                    },
                    {
-                    label: "failing tests",
+                    label: "Failing tests",
                     pointColor: "red",
                     fillColor: "rgba(230,237,236,0.4)",
                     strokeColor: "rgba(230,237,236,0.9)",
                     data: fail_data
                    },
                    {
-                    label: "skipped tests",
+                    label: "Skipped tests",
                     pointColor: "blue",
                     fillColor: "rgba(230,237,236,0.4)",
                     strokeColor: "rgba(230,237,236,0.9)",
@@ -160,8 +160,12 @@ var automationMetrics = (function () {
               }; 
 
         aggregateChart = new Chart(chartElement).Line(data);
-        legend = aggregateChart.generateLegend();
-        $('#aggLegend').html(legend);
+        
+        //create the legend
+        for (i=0; i<data.datasets.length; i++) {
+            listItem = "<li style='color:"+data.datasets[i].pointColor+"'>"+data.datasets[i].label+"</li>";
+            $(listItem).appendTo($('#aggLegend'));
+        }
         return aggregateChart;
     }
 
