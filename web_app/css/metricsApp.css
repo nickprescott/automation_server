@@ -41,10 +41,8 @@ ul {
   top: 25%;
   left: 25%;
   width: 50%;
-  height: 50%;
   border: 1px solid black;
   background-color: white;
-  overflow: auto;
 }
 
 .popup-title {
@@ -53,7 +51,6 @@ ul {
   font-family: inherit; 
   font-variant: small-caps;
   font-size: large;
-  overflow: auto;
 }
 
 #close-failure-popup {
@@ -65,7 +62,9 @@ ul {
   }
 
 .popup-content {
+  max-height: 400px;
   padding: 10px;
+  overflow: auto;
 }
 
 .legend {
