@@ -4,11 +4,6 @@ var automationMetrics = (function () {
             main_html:
 	        '<div class="application-container">'
                 + '<div class="chart-container">'
-	                + '<h2>Test Case Execution Times (seconds)</h2>'
-		            + '<select id="testSelector"></select>'
-		            + '<canvas id="executionTimeChart"></canvas>'
-	            + '</div>'
-                + '<div class="chart-container">'
                     + '<h2 style="float:left">Aggregate Test Status Counts</h2>'
                     + '<ul id="aggLegend" class="legend"></ul>'
                     + '<canvas id="aggTestCounts"></canvas>'
@@ -17,6 +12,11 @@ var automationMetrics = (function () {
                         + '<div id="failure-content" class="popup-content"></div>'
                     + '</div>'
                 + '</div>'
+                + '<div class="chart-container">'
+	                + '<h2>Test Case Execution Times (seconds)</h2>'
+		            + '<select id="testSelector"></select>'
+		            + '<canvas id="executionTimeChart"></canvas>'
+	            + '</div>'
 	        + '</div>',
             server: 'http://'+ location.host
         },
