@@ -13,7 +13,7 @@ var automationMetrics = (function () {
                     + '</div>'
                 + '</div>'
                 + '<div class="chart-container">'
-                    + '<h2>Aggregate Execution Time (seconds)</h2>'
+                    + '<h2>Total Execution Time (seconds)</h2>'
                     + '<canvas id="aggExecutionChart"></canvas>'
                 + '</div>'
                 + '<div class="chart-container">'
