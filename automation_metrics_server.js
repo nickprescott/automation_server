@@ -93,6 +93,16 @@ app.get('/api/testNamesByDateAndStatus', function(req, res) {
     });
 });
 
+app.get('/api/totalExecutionTimeByDay', function(req, res) {
+    var sql;
+    sql = "select date, SUM(execution_time) as time from execution_history Group BY date ORDER BY date ASC;"
+
+    db.all(sql, function(err, rows) {
+        res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(rows));
+    });
+});
+
 app.post('/api/sendfile', function(req, res) {
     var testcaseData = req.body;
     var sqlInsertTestcase, sqlInsertExecutionResult;

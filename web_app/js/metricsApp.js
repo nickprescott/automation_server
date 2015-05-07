@@ -13,6 +13,10 @@ var automationMetrics = (function () {
                     + '</div>'
                 + '</div>'
                 + '<div class="chart-container">'
+                    + '<h2>Aggregate Execution Time (seconds)</h2>'
+                    + '<canvas id="aggExecutionChart"></canvas>'
+                + '</div>'
+                + '<div class="chart-container">'
 	                + '<h2>Test Case Execution Times (seconds)</h2>'
 		            + '<select id="testSelector"></select>'
 		            + '<canvas id="executionTimeChart"></canvas>'
@@ -20,7 +24,9 @@ var automationMetrics = (function () {
 	        + '</div>',
             server: 'http://'+ location.host
         },
-        initModules, displayChart, getAggTestCounts, displayAggTestCounts, displayListOfFailedTests, getTestCaseData, getTests, formatDate;
+        initModules, displayChart, getAggTestCounts, displayAggTestCounts, 
+        displayAggExectutionChart, getAggExecutionTimes, 
+        displayListOfFailedTests, getTestCaseData, getTests, formatDate;
 
     initModule = function($container) {
         var selector; 
@@ -28,6 +34,7 @@ var automationMetrics = (function () {
         $container.html(configMap.main_html);
         
         getAggTestCounts($container.find('#aggTestCounts'));
+        getAggExecutionTimes($container.find('#aggExecutionChart'));
         getTests($container.find('#testSelector'), getTestCaseData);
 
         selector = $container.find('#testSelector');
@@ -72,7 +79,7 @@ var automationMetrics = (function () {
             pointDotRadius: 6,
             pointHitDetectionRadius: 0
         }
-        //Chart.defaults.global.tooltipTemplate = "<%= value %>";
+
         Chart.defaults.global.showTooltips = false;
 
         data = {
@@ -97,6 +104,45 @@ var automationMetrics = (function () {
             lineChart.datasets[0].points[x].fillColor = color;
         }
         lineChart.update();
+    }
+
+    //TODO: abstract chart displaying logic
+    displayAggExectutionChart = function(elementId, labels, values) {
+        var chartElement = $(elementId)[0].getContext("2d");
+        var lineChart, data;
+
+        data = {
+        labels: labels,
+        datasets: [
+                  {
+                    label: "Execution Time",
+                    fillColor: "rgba(230,237,236,0.4)",
+                    pointColor: "#A9C4C3",
+                    strokeColor: "rgba(230,237,236,0.9)",
+                    data: values
+                   }
+                ]
+              }; 
+
+        lineChart = new Chart(chartElement).Line(data);
+    }
+
+    getAggExecutionTimes = function(elementId) {
+        $.ajax({
+            url: '/api/totalExecutionTimeByDay',
+            type: 'GET',
+            dataType: 'json',
+            success: function(results) {
+                var labels = [];
+                var values = [];
+                var x;
+                for (x=0; x<results.length; x++) {
+                    labels.push(formatDate(results[x].date));
+                    values.push(parseInt(results[x].time));
+                }
+                displayAggExectutionChart(elementId, labels, values);
+            }
+        });
     }
 
     getAggTestCounts = function (elementId) {
