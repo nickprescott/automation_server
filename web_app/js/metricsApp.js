@@ -109,7 +109,9 @@ var automationMetrics = (function () {
     //TODO: abstract chart displaying logic
     displayAggExectutionChart = function(elementId, labels, values) {
         var chartElement = $(elementId)[0].getContext("2d");
-        var lineChart, data;
+        var lineChart, data, options;
+
+        options = { pointHitDetectionRadius: 2 }
 
         data = {
         labels: labels,
@@ -124,7 +126,7 @@ var automationMetrics = (function () {
                 ]
               }; 
 
-        lineChart = new Chart(chartElement).Line(data);
+        lineChart = new Chart(chartElement).Line(data, options);
     }
 
     getAggExecutionTimes = function(elementId) {
@@ -163,7 +165,7 @@ var automationMetrics = (function () {
     displayAggTestCounts = function(elementId, results) {
         var chartElement = $(elementId)[0].getContext("2d");
         var aggregateChart;
-        var  x, row, i, listItem;
+        var  x, row, i, listItem, options;
         var dates, pass_data, fail_data,skip_data;
         dates = [];
         pass_data = [];
@@ -177,6 +179,8 @@ var automationMetrics = (function () {
             fail_data.push(row.fail_count + row.error_count);
             skip_data.push(row.skip_count);
         }
+
+        options = { pointHitDetectionRadius: 2 }
 
         data = {
         labels: dates,
@@ -205,7 +209,7 @@ var automationMetrics = (function () {
                 ]
               }; 
 
-        aggregateChart = new Chart(chartElement).Line(data);
+        aggregateChart = new Chart(chartElement).Line(data, options);
         
         //create the legend
         for (i=0; i<data.datasets.length; i++) {
