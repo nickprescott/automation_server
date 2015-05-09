@@ -10,7 +10,7 @@ var server;
 var db = new sqlite3.Database(config.dbName);
 
 //Serve the index.html page
-app.use(express.static(__dirname+'/web_app'));
+app.use(express.static(__dirname+'/../web_app'));
 app.use(bodyParser.json());
 
 app.get('/api/testcases', function(req, res) {
