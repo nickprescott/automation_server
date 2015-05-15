@@ -124,5 +124,18 @@ app.post('/api/sendfile', function(req, res) {
     })
 });
 
+app.post('/api/updateTestDescription', function(req, res) {
+    var testcaseData = req.body;
+    var sqlUpdate;
+
+    sqlUpdate = "Update testcases set description = ? where name = ?;";
+    db.run(sqlUpdate, testcaseData.description, testcaseData.name, function(err) {
+        if(err)
+            console.log(err);
+    });
+    res.writeHead(201, {'Content-Type': 'application/json'});
+    res.end();
+});
+
 server = app.listen(config.port);
 console.log("server listening on port: %d", config.port)
