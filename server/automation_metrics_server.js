@@ -6,8 +6,10 @@ var fs = require('fs'),
     sqlite3 = require('sqlite3');
 
 var app = express();
-var server;
+var server, testsActive;
 var db = new sqlite3.Database(config.dbName);
+
+testsActive = false;
 
 //Serve the index.html page
 app.use(express.static(__dirname+'/../web_app'));
@@ -133,6 +135,18 @@ app.post('/api/updateTestDescription', function(req, res) {
         if(err)
             console.log(err);
     });
+    res.writeHead(201, {'Content-Type': 'application/json'});
+    res.end();
+});
+
+app.get('/api/testsAreActive', function(req, res) {
+    res.set('Content-Type', 'application/json');
+    res.send({active: testsActive});
+});
+
+app.post('/api/testsAreActive', function(req, res) {
+    var activeStatus = req.body.active;
+    testsActive = activeStatus;
     res.writeHead(201, {'Content-Type': 'application/json'});
     res.end();
 });
