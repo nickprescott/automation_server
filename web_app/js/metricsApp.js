@@ -13,7 +13,7 @@ var automationMetrics = (function () {
                     + '</div>'
                 + '</div>'
                 + '<div class="chart-container">'
-                    + '<h2>Total Execution Time (seconds)</h2>'
+                    + '<h2>Total Execution Time (mins)</h2>'
                     + '<canvas id="aggExecutionChart"></canvas>'
                 + '</div>'
                 + '<div class="chart-container">'
@@ -130,6 +130,7 @@ var automationMetrics = (function () {
     }
 
     getAggExecutionTimes = function(elementId) {
+        var execTime;
         $.ajax({
             url: '/api/totalExecutionTimeByDay',
             type: 'GET',
@@ -140,7 +141,9 @@ var automationMetrics = (function () {
                 var x;
                 for (x=0; x<results.length; x++) {
                     labels.push(formatDate(results[x].date));
-                    values.push(parseInt(results[x].time));
+                    //execution time in mins with only 2 decimal places
+                    execTime = Math.round(parseInt(results[x].time)/60 *100)/100; 
+                    values.push(execTime);
                 }
                 displayAggExectutionChart(elementId, labels, values);
             }
