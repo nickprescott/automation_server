@@ -45,10 +45,16 @@ ul {
   background-color: white;
 }
 
+.stacktrace-content {
+  word-break: break-all;
+  color: darkred;
+  display: none;
+}
+
 .popup-title {
   padding: 5px;
   background-color: rgba(191,191,191,.5);
-  font-family: inherit; 
+  font-family: inherit;
   font-variant: small-caps;
   font-size: large;
 }
@@ -61,10 +67,22 @@ ul {
     font-weight: bold;
   }
 
+#close-stacktrace-popup {
+  float: right;
+  cursor: pointer;
+}
+  #close-stacktrace-popup:hover {
+    font-weight: bold;
+  }
+
 .popup-content {
   max-height: 400px;
   padding: 10px;
   overflow: auto;
+}
+
+#failure-content > .clickable-test-name:hover {
+  font-weight: bold;
 }
 
 .legend {

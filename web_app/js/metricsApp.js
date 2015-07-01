@@ -245,19 +245,35 @@ var automationMetrics = (function () {
                     type : 'GET',
                     dataType: 'json',
                     success : function (moreResults) {
-                        var output, x;
+                        var failedCases, x;
                         allResults = allResults.concat(moreResults);
-                        output = "";
+                        failedCases = "";
 
+                        // Create the popup's content - the list of test names and associated stack traces 
                         for( x=0; x < allResults.length; x++) {
-                            output += allResults[x].name + "<br>";
+                          testName = allResults[x].name;
+                          getStackTraceOfFailedTest(testName, failureDate, function(stackTrace) {
+                            failedCases += '<div id="' + testName + '" title="click to view stack trace" class="clickable-test-name" onclick=$("#'+testName+'stackTrace").slideToggle()>' + testName + '<pre id="' + testName + 'stackTrace" class="stacktrace-content">' + stackTrace.error_msg + '</pre></div>';
+                          });
                         }
+
                         //display popup with failed test names
-                        $('#failure-content').html(output);
+                        $('#failure-content').html(failedCases);
                         $('#failure-popup').css('display', 'block');
                     }
                 });
             }
+        });
+    };
+
+    getStackTraceOfFailedTest = function(testName, failureDate, callback) {
+    $.ajax({
+        url : configMap.server + '/api/stackTracesByDateAndName',
+        data: { date: failureDate, name: testName},
+        type : 'GET',
+        dataType: 'json',
+        async: false,
+        success : callback
         });
     };
 

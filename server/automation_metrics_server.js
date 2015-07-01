@@ -111,6 +111,19 @@ app.get('/api/totalExecutionTimeByDay', function(req, res) {
     });
 });
 
+app.get('/api/stackTracesByDateAndName', function(req, res) {
+	var sql; // the sql commands that get us what we want
+	var date = req.query.date;
+	var name = req.query.name;
+
+	sql = "select eh.error_msg from execution_history eh, testcases tc where eh.tc_id = tc.testcase_id and eh.date = ? and tc.name = ?;";
+
+	db.get(sql, date, name, function(err, row) {
+	    res.set('Content-Type', 'application/json');
+	    res.send(JSON.stringify(row));
+     });
+});
+
 app.post('/api/sendfile', function(req, res) {
     var testcaseData = req.body;
     var sqlInsertTestcase, sqlInsertExecutionResult;
