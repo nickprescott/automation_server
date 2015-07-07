@@ -35,6 +35,12 @@ ul {
   width: 94%;
 }
 
+.test-description {
+  padding: 3px;
+  float: left;
+  width: 60%;
+}
+
 .popup {
   display: none;
   position: fixed;

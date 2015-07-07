@@ -27,7 +27,7 @@ app.get('/api/testcases', function(req, res) {
 
     name = req.query.tests;
 
-    sqlSelect = "Select tc.name, eh.status, eh.date, eh.execution_time from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and tc.name = ? ORDER BY eh.date ASC";
+    sqlSelect = "Select tc.name, tc.description, eh.status, eh.date, eh.execution_time from testcases tc, execution_history eh where eh.tc_id = tc.testcase_id and tc.name = ? ORDER BY eh.date ASC";
 
     //process each row. Could use db.all instead...
     //on completion, send all the rows to the client

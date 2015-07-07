@@ -18,6 +18,7 @@ var automationMetrics = (function () {
                 + '</div>'
                 + '<div class="chart-container">'
 	                + '<h2>Test Case Execution Times (seconds)</h2>'
+                    + '<div id="testDescription" class="test-description"></div>'
 		            + '<select id="testSelector"></select>'
 		            + '<canvas id="executionTimeChart"></canvas>'
 	            + '</div>'
@@ -59,6 +60,10 @@ var automationMetrics = (function () {
                 var timestamps = [];
                 var statuses = [];
                 var x, row;
+
+                if(typeof results[0] !== 'undefined' && typeof results[0].description !== 'undefined') {
+                    $('#testDescription').html(results[0].description);
+                }
 
                 for(x=0; x<results.length; x++) {
                     row = results[x];
