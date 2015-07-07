@@ -55,6 +55,7 @@ ul {
   word-break: break-all;
   color: darkred;
   display: none;
+  font-weight: normal;
 }
 
 .popup-title {
